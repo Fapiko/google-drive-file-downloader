@@ -27,7 +27,17 @@ func main() {
 		panic(err)
 	}
 
-	fileId := filepath.Base(filepath.Dir(uri.Path))
+	fileId := ""
+	if uri.Query().Get("id") != "" {
+		fileId = uri.Query().Get("id")
+	} else {
+		fileId = filepath.Base(filepath.Dir(uri.Path))
+	}
+
+	if len(fileId) < 20 {
+		log.Error("FileId not parsed correctly for: " + strUrl)
+		os.Exit(1)
+	}
 
 	resp, err := http.Get(fmt.Sprintf("https://docs.google.com/uc?id=%s&export=download", fileId))
 	if err != nil {
